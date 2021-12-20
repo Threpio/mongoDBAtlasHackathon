@@ -30,6 +30,14 @@ func checkPasswordHash(password, hash string) bool {
 	return err == nil
 }
 
+func (ac *AuthController) PutSessionTokenIntoDatabase(sessionToken string) error {
+	// TODO: Sort this mess out
+
+	// The name of the collection is hard baked into the db object?1?!??!?!?!
+	_, err := ac.DB.Collection("session_tokens").InsertOne(ac.ctx, bson.M{"session_token": sessionToken})
+	return err
+}
+
 func (ac *AuthController) PutNewUserIntoDB(user *User) error {
 	err := ac.DB.InsertOne("users", user)
 	if err != nil {

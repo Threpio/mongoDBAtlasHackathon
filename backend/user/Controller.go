@@ -1,25 +1,33 @@
 package user
 
 import (
+	"crypto/rand"
+	"encoding/hex"
+	"errors"
 	"github.com/go-chi/chi"
 	"github.com/threpio/mongoDBAtlasHackathon/backend/db"
+	"github.com/threpio/mongoDBAtlasHackathon/backend/util"
 	swizzle "github.com/threpio/mongoDBAtlasHackathon/backend/error-constants"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/x/mongo/driver/uuid"
 	"net/mail"
-	"errors"
 	"time"
 )
 
 type AuthController struct {
 	Router *chi.Router
-	DB *db.DB
+	DB     *db.DB
 }
 
 func (ac *AuthController) GenerateSessionToken(email string) (string, error) {
-	// TODO: Generate Session Token
+	b := make([]byte, 32)
+	if _, err := rand.Read(b); err != nil {
+		return "", err
+	}
+	token := util.Base64EncodeString(string(b))
 
-	return "", nil
+
+
+	return token, nil
 }
 
 func (ac *AuthController) ValidateSessionToken(token string) bool {
@@ -51,24 +59,31 @@ func (ac *AuthController) RegisterUser(attempt NewUserAttempt) (string, error) {
 		return "", errors.New(swizzle.PasswordTooShort)
 	}
 	// Check that the email is not already registered
-	if ac.IsEmailAlreadyInUse(attempt.Email) {
+
+	if ac.IsEmailAlreadyInUse(util.Base64EncodeString(attempt.Email)) {
 		return "", errors.New(swizzle.EmailExists)
 	}
 
 	// Create the User
 	var user User
 	user.UUID, _ = uuid.New()
-	user.Name = attempt.Name
-	user.Email = attempt.Email
-	user.PasswordHash, _ = hashPassword(attempt.Password)
+	base64EncodedName := util.Base64EncodeString(attempt.Name)
+	base64EncodedEmail := util.Base64EncodeString(attempt.Email)
+	base64EncodedPassword := util.Base64EncodeString(attempt.Password)
+
+	user.Name = base64EncodedName
+	user.Email = base64EncodedEmail
+	user.PasswordHash, _ = hashPassword(base64EncodedPassword)
 	user.EmailConfirmed = false
 	user.SuperAdmin = false
 	user.CreatedAt = time.Now().Format(time.RFC3339)
 	user.UpdatedAt = time.Now().Format(time.RFC3339)
 	err = ac.PutNewUserIntoDB(&user)
-
 	// Send Confirmation email?
 	//
-
-	return "", errors.New(swizzle.EmailInvalid)
+	if err != nil {
+		return "", err
+	}
+	// TODO: Session Token
+	return "", nil
 }
