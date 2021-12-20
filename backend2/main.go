@@ -40,7 +40,7 @@ func StartServer() error {
 	var srv *http.Server
 	go func() {
 		srv = &http.Server{
-			Addr: ":" + PORT,
+			Addr:    ":" + PORT,
 			Handler: app.Router(),
 		}
 		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
@@ -48,7 +48,7 @@ func StartServer() error {
 		}
 	}()
 
-	<- stopChan
+	<-stopChan
 	// Do app.Stop
 	fmt.Println("\r")
 	fmt.Println("Stopping server...")
@@ -58,4 +58,5 @@ func StartServer() error {
 		//app.Shutdown()
 		//app.Logger.Info("App stopped")
 	}()
+	return errors.New("server stopped")
 }

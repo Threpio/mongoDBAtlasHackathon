@@ -47,7 +47,7 @@ func NewDB() (*DB, error) {
 
 //InsertOne inserts one document into the specified collection
 //Uses bson.M which does NOT care about the order of the json fields and data
-func (db *DB) InsertOne(collectionName string, data bson.M ) error {
+func (db *DB) InsertOne(collectionName string, data bson.M) error {
 	collection := db.Client.Database(db.DatabaseName).Collection(collectionName)
 	_, err := collection.InsertOne(db.BasicContext, data)
 	return err
@@ -80,4 +80,3 @@ func (db *DB) FindAllFromFilter(collectionName string, filter bson.M) (*mongo.Cu
 	//for _, result := range results { fmt.Println(result) }
 	return cursor, nil
 }
-

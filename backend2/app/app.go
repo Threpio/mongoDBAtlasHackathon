@@ -12,7 +12,7 @@ import (
 )
 
 type App struct {
-	Ctx context.Context
+	Ctx               context.Context
 	shutdownCallbacks []func()
 
 	IngestController *ingest.Controller
@@ -38,7 +38,7 @@ func NewApp(db db.DB) *App {
 	fmt.Println("Finished Initialising NewApp")
 	return &App{
 		IngestController: ingestController,
-		MetaController: metaController,
+		MetaController:   metaController,
 	}
 }
 

@@ -17,7 +17,7 @@ type Controller struct {
 
 func NewController(db db.DB, logger logger.Logger) (*Controller, error) {
 	controller := &Controller{
-		DB: db,
+		DB:     db,
 		logger: logger,
 	}
 	controller.Router = controller.ingestRouter()
@@ -57,11 +57,8 @@ func (c *Controller) searchIngest(in *types.SearchIngestRequest) (*types.SearchI
 		fmt.Println(result)
 	}
 
-
-
 	//TODO: Iterate over results
 	//TODO: Check errors
-
 
 	//Convert a string to a bson.M
 	//var filter bson.M
@@ -69,8 +66,5 @@ func (c *Controller) searchIngest(in *types.SearchIngestRequest) (*types.SearchI
 	//	return nil, err
 	//}
 
-
 	return nil, nil
 }
-
-

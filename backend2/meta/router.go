@@ -7,4 +7,3 @@ func (c *Controller) metaRouter() func(r chi.Router) {
 		r.Get("/", c.HandleGetMeta)
 	}
 }
-

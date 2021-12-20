@@ -20,8 +20,6 @@ func (l *Logger) stdout(level string, message string) {
 	)
 }
 
-
-
 func (l *Logger) Debug(message string) {
 	l.stdout("DEBUG", message)
 }
