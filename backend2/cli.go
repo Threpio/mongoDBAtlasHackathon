@@ -19,9 +19,7 @@ Use "core [command] --help" for more information about a command.
 func Run(args []string) error {
 	switch args[0] {
 	case "start":
-		StartServer()
-		// TODO: Start Function
-		return errors.New("not implemented")
+		return StartServer()
 	case "version":
 		return version()
 	default:
