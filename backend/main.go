@@ -3,46 +3,55 @@ package main
 import (
 	"errors"
 	"fmt"
+	"github.com/threpio/mongoDBAtlasHackathon/backend2/app"
+	"github.com/threpio/mongoDBAtlasHackathon/backend2/db"
+	"net/http"
 	"os"
+	"os/signal"
 )
 
-var versionNumber = "0.0.1"
+// cli.go Is where the actual main.go function is found.
 
-var cliHelp = `Command-line interface and server.
-Usage core [command]
-Available Commands:
-	start
-	version
-Use "core [command] --help" for more information about a command.
-`
+const (
+	PORT = "8080"
+)
 
-func Run(args []string) error {
-	switch args[0] {
-	case "start":
-		// TODO: Start Function
-		return errors.New("not implemented")
-	case "version":
-		return version()
-	default:
-		return help()
-	}
-}
-
-func version() error {
-	fmt.Printf("Version: %s", versionNumber)
-	return nil
-}
-
-func help() error {
-	return errors.New(cliHelp)
-}
-
-func main() {
-	if len(os.Args) < 2 {
-		os.Args = append(os.Args, "help")
+// StartServer is the main function of this application.
+// It returns an error that the application throws if it panics or shutdown gracefully.
+// It also returns an error if the application is unable to start.
+func StartServer() error {
+	DB, err := db.NewDB()
+	if err != nil {
+		panic(err)
 	}
 
-	if err := Run(os.Args[1:]); err != nil {
-		fmt.Println(err)
-	}
+	app := app.NewApp(*DB)
+
+	stopChan := make(chan os.Signal)
+	signal.Notify(stopChan, os.Interrupt)
+
+	fmt.Printf("Starting server on port %s\n", PORT)
+
+	var srv *http.Server
+	go func() {
+		srv = &http.Server{
+			Addr:    ":" + PORT,
+			Handler: app.Router(),
+		}
+		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			panic(err)
+		}
+	}()
+
+	<-stopChan
+	// Do app.Stop
+	fmt.Println("\r")
+	fmt.Println("Stopping server... Press Ctrl+C again to force.")
+	defer func() {
+		// Implement these things
+		//app.Logger.Info("App is stopping...")
+		//app.Shutdown()
+		//app.Logger.Info("App stopped")
+	}()
+	return errors.New("---- server stopped")
 }
