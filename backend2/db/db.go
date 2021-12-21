@@ -60,6 +60,14 @@ func (db *DB) InsertOne(collectionName string, data bson.M) error {
 	return err
 }
 
+//InsertMany inserts many documents into the specified collection
+//Uses bson.M which does NOT care about the order of the json fields and data
+func (db *DB) InsertMany(collectionName string, data []interface{}) error {
+	collection := db.Client.Database(db.DatabaseName).Collection(collectionName)
+	_, err := collection.InsertMany(db.BasicContext, data)
+	return err
+}
+
 //FindOne returns one document from the specified collection
 //Returns a bson.M that needs to be decoded ( bson.M.decode() )
 //You need to check if the result.Err() is mongo.ErrNoDocuments if it returns Err

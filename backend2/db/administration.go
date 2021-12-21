@@ -32,7 +32,7 @@ func (c collections) GetCollectionOptions(name string) *options.CreateCollection
 }
 
 //TODO: Clean these functions up
-
+//TODO: Make it so that the TimeSeries collections have different parameters
 
 //ConfigureCollections to be run on startup to check that a number of different Collections exist
 //Creates the collections if not already exist
@@ -60,7 +60,7 @@ func (db *DB) ConfigureCollections() error {
 			}
 		}
 	}
-	return nil
+	return db.ConfigureTimeSeriesCollections()
 }
 
 //CheckIfCollectionExists is used to check if a further DB initialisation is required.
@@ -82,8 +82,33 @@ func (db *DB) CheckIfCollectionExists(collectionName string) (bool, error) {
 //CreateCollection creates a collection with a specified name and with creationParameters
 //It does NOT check if the collection already exists and will return an error for sure if it does.
 func (db *DB) CreateCollection(collectionName string, collectionCreationParams ...*options.CreateCollectionOptions) error {
-	if err := db.Client.Database(db.DatabaseName).CreateCollection(db.BasicContext, collectionName, collectionCreationParams...); err != nil {
+	return db.Client.Database(db.DatabaseName).CreateCollection(db.BasicContext, collectionName, collectionCreationParams...)
+}
+
+func (db *DB) ConfigureTimeSeriesCollections() error {
+	exists, err := db.CheckIfCollectionExists("timeSeries")
+	if err != nil {
 		return err
+	}
+	if !exists {
+		fmt.Println("Creating collection: timeSeries")
+
+		timeField := "timestamp"
+		metaField := "meta"
+		granularity := "seconds"
+
+		options := options.CreateCollectionOptions{
+			Capped: nil,
+			TimeSeriesOptions: &options.TimeSeriesOptions{
+				TimeField:   timeField,
+				MetaField:   &metaField,
+				Granularity: &granularity,
+			},
+		}
+
+		if err = db.CreateCollection("timeSeries", &options); err != nil {
+			return err
+		}
 	}
 	return nil
 }

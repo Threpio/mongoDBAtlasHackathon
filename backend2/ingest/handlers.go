@@ -25,12 +25,13 @@ func (c *Controller) handleStructuredIngest(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	if err := c.structuredIngest(&structuredIngestRequest); err != nil {
+	count, err := c.structuredIngest(&structuredIngestRequest)
+	if err != nil {
 		c.logger.Debug(fmt.Sprintf("Error in structured ingest: %s", err))
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	w.Write([]byte("OK"))
+	fmt.Fprintf(w, "Successfully ingested %d events", count)
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -46,12 +47,13 @@ func (c *Controller) handleSearchIngest(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	//if err := c.searchIngest(&searchIngestRequest); err != nil {
-	//	c.logger.Debug(fmt.Sprintf("Error in search ingest: %s", err))
-	//	w.WriteHeader(http.StatusInternalServerError)
-	//	return
-	//}
+	response, err := c.searchIngest(&searchIngestRequest)
+	if err != nil {
+		c.logger.Debug(fmt.Sprintf("Error in search ingest: %s", err))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("OK"))
+	w.Write(response)
 }

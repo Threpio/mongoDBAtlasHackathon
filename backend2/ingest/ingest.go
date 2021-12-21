@@ -1,12 +1,15 @@
 package ingest
 
 import (
-	"fmt"
+	"context"
+	"encoding/json"
 	"github.com/go-chi/chi"
 	"github.com/threpio/mongoDBAtlasHackathon/backend2/db"
 	"github.com/threpio/mongoDBAtlasHackathon/backend2/logger"
 	"github.com/threpio/mongoDBAtlasHackathon/backend2/types"
 	"go.mongodb.org/mongo-driver/bson"
+	"log"
+	"time"
 )
 
 type Controller struct {
@@ -24,47 +27,54 @@ func NewController(db db.DB, logger logger.Logger) (*Controller, error) {
 	return controller, nil
 }
 
-func (c *Controller) structuredIngest(in *types.StructuredIngestRequest) error {
-
-	return nil
-}
-
-func (c *Controller) searchIngest(in *types.SearchIngestRequest) (*types.SearchIngestResponse, error) {
-
-	//TODO: Validate input request within params
-	var filter bson.M
-
-	if err := bson.UnmarshalExtJSON([]byte(in.Query), true, &filter); err != nil {
-		return nil, err
+//TODO: Change this to use INSERTMANY and not insertSingle many times
+func (c *Controller) structuredIngest(in *types.StructuredIngestRequest) (count int, err error) {
+	count = 0
+	var toInsert []interface{}
+	for _, e := range in.Events {
+		data := bson.M{
+			"timestamp": time.Unix(e.Timestamp, 0),
+			"meta":      e.Data,
+		}
+		toInsert = append(toInsert, data)
+		count++
 	}
 
-	cursor, err := c.DB.FindAllFromFilter("test", filter)
+	return count, c.DB.InsertMany("timeSeries", toInsert)
+}
+
+func (c *Controller) searchIngest(in *types.SearchIngestRequest) ([]byte, error) {
+
+	//TODO: Validate input request within params
+	// If in.Query == ""/nil then make it {}
+	//  ...{
+	//	... "timestamp": {
+	//	..... $gte: ISODate("2021-12-21T10:58:52.000Z"),
+	//	..... $lt: ISODate("2021-12-21T10:58:59.000Z")
+	//	..... }
+	//	... }
+
+	query := bson.M{
+		"timestamp": bson.M{
+			"$gte": time.Unix(in.TimeFrom, 0),
+			"$lt":  time.Unix(in.TimeTo, 0),
+		},
+	}
+
+	cursor, err := c.DB.FindAllFromFilter("timeSeries", query)
 	if err != nil {
 		return nil, err
 	}
 
-	var results []bson.M
-	var singleResult types.Event
-	if err := cursor.All(nil, &results); err != nil {
+	var result []bson.M
+	if err = cursor.All(context.TODO(), &result); err != nil {
+		log.Fatal(err)
+	}
+	body, err := json.Marshal(result)
+	if err != nil {
 		return nil, err
 	}
-	//TODO: Something with this result.
-	for _, result := range results {
-		if err := bson.UnmarshalExtJSON([]byte(result["event"].(string)), true, &singleResult); err != nil {
-			c.logger.Debug("failed to unmarshall an Ext JSON string in the searchIngest function")
-			return nil, err
-		}
-		fmt.Println(result)
-	}
+	// TODO: Handle null
 
-	//TODO: Iterate over results
-	//TODO: Check errors
-
-	//Convert a string to a bson.M
-	//var filter bson.M
-	//if err := bson.UnmarshalExtJSON([]byte(in.Query), true, &filter); err != nil {
-	//	return nil, err
-	//}
-
-	return nil, nil
+	return body, nil
 }
