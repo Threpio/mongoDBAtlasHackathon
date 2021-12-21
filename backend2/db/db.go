@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	dbName     string = ""
+	dbName     string = "test"
 	dbUser     string = ""
 	dbPassword string = ""
 	dbCluster  string = ""
@@ -27,7 +27,6 @@ func NewDB() (*DB, error) {
 
 	//uri := fmt.Sprintf("mongodb+srv://%s:%s@%s.h9r61.mongodb.net/%s?retryWrites=true&w=majority", dbUser, dbPassword, dbCluster, dbName)
 	uri := "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000"
-	fmt.Println(uri)
 	client, err := mongo.NewClient(options.Client().ApplyURI(uri))
 	if err != nil {
 		panic(err)
@@ -37,11 +36,19 @@ func NewDB() (*DB, error) {
 	if err != nil {
 		panic(err)
 	}
+
 	DB := &DB{
 		Client:       client,
 		DatabaseName: dbName,
 		BasicContext: context.Background(),
 	}
+
+	fmt.Sprintf("Starting General DB Collection Confituration")
+	err = DB.ConfigureCollections()
+	if err != nil {
+		return nil, err
+	}
+
 	return DB, nil
 }
 

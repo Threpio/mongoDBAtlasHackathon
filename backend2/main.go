@@ -27,13 +27,8 @@ func StartServer() error {
 
 	app := app.NewApp(*DB)
 
-	//TODO: Remove this once Debugging
-	fmt.Println("Initialising stopChannel")
 	stopChan := make(chan os.Signal)
 	signal.Notify(stopChan, os.Interrupt)
-
-	//TODO: Remove this once Debugging
-	fmt.Println("Finished Initialising stopChannel")
 
 	fmt.Printf("Starting server on port %s\n", PORT)
 
@@ -51,12 +46,12 @@ func StartServer() error {
 	<-stopChan
 	// Do app.Stop
 	fmt.Println("\r")
-	fmt.Println("Stopping server...")
+	fmt.Println("Stopping server... Press Ctrl+C again to force.")
 	defer func() {
 		// Implement these things
 		//app.Logger.Info("App is stopping...")
 		//app.Shutdown()
 		//app.Logger.Info("App stopped")
 	}()
-	return errors.New("server stopped")
+	return errors.New("---- server stopped")
 }
