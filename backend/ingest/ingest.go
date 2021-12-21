@@ -27,7 +27,6 @@ func NewController(db db.DB, logger logger.Logger) (*Controller, error) {
 	return controller, nil
 }
 
-//TODO: Change this to use INSERTMANY and not insertSingle many times
 func (c *Controller) structuredIngest(in *types.StructuredIngestRequest) (count int, err error) {
 	count = 0
 	var toInsert []interface{}
