@@ -31,15 +31,18 @@ func (c collections) GetCollectionOptions(name string) *options.CreateCollection
 	}
 }
 
+//TODO: Clean these functions up
+
+
 //ConfigureCollections to be run on startup to check that a number of different Collections exist
 //Creates the collections if not already exist
 func (db *DB) ConfigureCollections() error {
 
 	collectionReferences := collections{
 		Names: []string{"users", "repositories", "stats"},
-		Users: nil,
-		Repos: nil,
-		Stats: nil,
+		Users: &options.CreateCollectionOptions{},
+		Repos: &options.CreateCollectionOptions{},
+		Stats: &options.CreateCollectionOptions{},
 	}
 	for _, name := range collectionReferences.Names {
 		exists, err := db.CheckIfCollectionExists(name)
@@ -48,13 +51,13 @@ func (db *DB) ConfigureCollections() error {
 		}
 		if !exists {
 			fmt.Println("Creating collection: " + name)
-			err = db.CreateCollection(name, collectionReferences.GetCollectionOptions(name))
-			if err != nil {
+			options := options.CreateCollectionOptions{}
+			options.SetMaxDocuments(1000)
+			options.SetCapped(true)
+			options.SetSizeInBytes(100000000)
+			if err = db.CreateCollection(name, &options); err != nil {
 				return err
 			}
-		}
-		if err := db.CreateCollection(name); err != nil {
-			return err
 		}
 	}
 	return nil
@@ -68,11 +71,8 @@ func (db *DB) CheckIfCollectionExists(collectionName string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	fmt.Println(names)
 	for _, name := range names {
-		fmt.Println(name)
 		if name == collectionName {
-			fmt.Println("Collection exists")
 			return true, nil
 		}
 	}
@@ -88,5 +88,3 @@ func (db *DB) CreateCollection(collectionName string, collectionCreationParams .
 	return nil
 }
 
-type collectionsCursorResponse struct {
-}
