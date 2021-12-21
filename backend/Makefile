@@ -24,3 +24,7 @@ server: clean build
 	@mkdir -p dist/
 	go build -o dist/backend
 	./dist/backend start
+
+docker-run: build
+	docker build -t backend .
+	docker run -p 8080:8080 -d backend

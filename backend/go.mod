@@ -1,4 +1,4 @@
-module github.com/threpio/mongoDBAtlasHackathon/backend2
+module github.com/threpio/mongoDBAtlasHackathon/backend
 
 go 1.17
 
