@@ -37,6 +37,9 @@ func NewDB() (*DB, error) {
 		panic(err)
 	}
 
+	client.Database(dbName).Collection("test").Find(context.Background(), bson.M{})
+
+
 	DB := &DB{
 		Client:       client,
 		DatabaseName: dbName,

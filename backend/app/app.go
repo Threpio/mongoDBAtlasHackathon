@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	"github.com/threpio/mongoDBAtlasHackathon/backend2/db"
-	"github.com/threpio/mongoDBAtlasHackathon/backend2/ingest"
-	"github.com/threpio/mongoDBAtlasHackathon/backend2/logger"
-	"github.com/threpio/mongoDBAtlasHackathon/backend2/meta"
+	"github.com/threpio/mongoDBAtlasHackathon/backend/db"
+	"github.com/threpio/mongoDBAtlasHackathon/backend/ingest"
+	"github.com/threpio/mongoDBAtlasHackathon/backend/logger"
+	"github.com/threpio/mongoDBAtlasHackathon/backend/meta"
 )
 
 type App struct {

@@ -4,9 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/go-chi/chi"
-	"github.com/threpio/mongoDBAtlasHackathon/backend2/db"
-	"github.com/threpio/mongoDBAtlasHackathon/backend2/logger"
-	"github.com/threpio/mongoDBAtlasHackathon/backend2/types"
+	"github.com/threpio/mongoDBAtlasHackathon/backend/db"
+	"github.com/threpio/mongoDBAtlasHackathon/backend/logger"
+	"github.com/threpio/mongoDBAtlasHackathon/backend/types"
 	"go.mongodb.org/mongo-driver/bson"
 	"log"
 	"time"
@@ -60,10 +60,12 @@ func (c *Controller) searchIngest(in *types.SearchIngestRequest) ([]byte, error)
 		},
 	}
 
+
 	cursor, err := c.DB.FindAllFromFilter("timeSeries", query)
 	if err != nil {
 		return nil, err
 	}
+
 
 	var result []bson.M
 	if err = cursor.All(context.TODO(), &result); err != nil {

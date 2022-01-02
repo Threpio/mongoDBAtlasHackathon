@@ -39,7 +39,7 @@ func (c collections) GetCollectionOptions(name string) *options.CreateCollection
 func (db *DB) ConfigureCollections() error {
 
 	collectionReferences := collections{
-		Names: []string{"users", "repositories", "stats"},
+		Names: []string{"users", "repositories", "stats", "organisation", "timeSeries"},
 		Users: &options.CreateCollectionOptions{},
 		Repos: &options.CreateCollectionOptions{},
 		Stats: &options.CreateCollectionOptions{},

@@ -3,7 +3,7 @@ package ingest
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/threpio/mongoDBAtlasHackathon/backend2/types"
+	"github.com/threpio/mongoDBAtlasHackathon/backend/types"
 	"io/ioutil"
 	"net/http"
 )

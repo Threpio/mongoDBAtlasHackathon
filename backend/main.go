@@ -3,8 +3,8 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/threpio/mongoDBAtlasHackathon/backend2/app"
-	"github.com/threpio/mongoDBAtlasHackathon/backend2/db"
+	"github.com/threpio/mongoDBAtlasHackathon/backend/app"
+	"github.com/threpio/mongoDBAtlasHackathon/backend/db"
 	"net/http"
 	"os"
 	"os/signal"

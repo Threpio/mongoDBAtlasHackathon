@@ -2,8 +2,8 @@ package meta
 
 import (
 	"github.com/go-chi/chi"
-	"github.com/threpio/mongoDBAtlasHackathon/backend2/db"
-	"github.com/threpio/mongoDBAtlasHackathon/backend2/logger"
+	"github.com/threpio/mongoDBAtlasHackathon/backend/db"
+	"github.com/threpio/mongoDBAtlasHackathon/backend/logger"
 	"net/http"
 	"net/http/httptest"
 	"testing"
